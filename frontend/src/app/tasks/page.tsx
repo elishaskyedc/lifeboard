@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TaskItem from "@/components/TaskItem";
 
 export default function TasksPage() {
   const [task, setTask] = useState(""); // what you're currently typing
@@ -52,36 +53,25 @@ export default function TasksPage() {
       <ul className="mt-6 space-y-2">
         {tasks.map((task, index) => ( /* .map() = goes through every item in an array to find specific task + displays array
                                       key={index} = gives numbered position in list/array */
-          <li key={index} className="rounded-lg border p-3">
-            <label className="flex items-center gap-2">
-
-              {/* working checkbox */}
-              <input
-                type="checkbox"
-                checked={task.completed ?? false}
-                onChange={() => {
-                  setTasks(
-                    tasks.map((currentTask, currentIndex) => // .map() = creates updated array | currentTask = task we're looking at | currentIndex = position in array
-                      currentIndex === index // "is this the task the user clicked?"
-                        ? { ...currentTask, completed: !currentTask.completed } // if yes... (! = not)
-                        : currentTask // if isn't task we clicked keep unchanged
-                    )
-                  );
-                }}
-              />
-
-              <span>{task.title}</span>
-            </label>
-
-            <button
-              onClick={() => { // _ = first value (task) but not needed, only index matters
-                setTasks(tasks.filter((_, currentIndex) => currentIndex !== index)); // setTasks(...) = tells React about new list
-              }} // filter() = JS concept that creates new array of everything except task we want to remove
-              className="ml-4 rounded-lg border px-3 py-1"
-            >
-              Delete
-            </button>
-          </li>
+          <TaskItem
+            key={index}
+            title={task.title}
+            completed={task.completed}
+            onToggle={() => {
+              setTasks(
+                tasks.map((currentTask, currentIndex) =>
+                  currentIndex === index
+                    ? { ...currentTask, completed: !currentTask.completed }
+                    : currentTask
+                )
+              );
+            }}
+            onDelete={() => {
+              setTasks(
+                tasks.filter((_, currentIndex) => currentIndex !== index)
+              );
+            }}
+          />
         ))}
       </ul>
     </main>
