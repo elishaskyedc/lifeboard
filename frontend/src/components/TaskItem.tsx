@@ -13,20 +13,29 @@ export default function TaskItem({
   onDelete,
 }: TaskItemProps) {
   return (
-    <li className="rounded-lg border p-3">
-      <label className="flex items-center gap-2">
+    <li className="flex items-center justify-between rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm">
+      <label className="flex items-center gap-3">
         <input
           type="checkbox"
           checked={completed}
           onChange={onToggle}
+          className="h-5 w-5 accent-[var(--primary)]"
         />
 
-        <span>{title}</span>
+        <span
+          className={
+            completed
+              ? "text-[var(--muted)] line-through"
+              : "font-semibold"
+          }
+        >
+          {title}
+        </span>
       </label>
 
       <button
         onClick={onDelete}
-        className="ml-4 rounded-lg border px-3 py-1"
+        className="rounded-full border border-[var(--border)] px-3 py-1 text-sm font-semibold text-[var(--muted)] transition hover:bg-[var(--primary-soft)] hover:text-[var(--primary-dark)]"
       >
         Delete
       </button>
