@@ -2,28 +2,81 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   getJournalEntries,
   saveJournalEntries,
 } from "@/components/journalData";
 import DatePicker from "@/components/DatePicker";
 
-export default function NewJournalEntryPage() {
-  const today = new Date().toISOString().split("T")[0];
+export default function EditJournalEntryPage() {
+  const params = useParams();
+  const entryId = Number(params.id);
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [date, setDate] = useState(today);
+  const entries = getJournalEntries();
+  const entry = entries.find((entry) => entry.id === entryId);
+
+  const getToday = () => {
+    const today = new Date();
+
+    return `${today.getFullYear()}-${String(
+      today.getMonth() + 1
+    ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  };
+
+  const convertDateToInputValue = (date: string) => {
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return getToday();
+    }
+
+    return `${parsedDate.getFullYear()}-${String(
+      parsedDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
+  };
+
+  const [title, setTitle] = useState(entry?.title ?? "");
+  const [content, setContent] = useState(entry?.content ?? "");
+  const [date, setDate] = useState(
+    entry ? convertDateToInputValue(entry.date) : ""
+  );
 
   const router = useRouter();
 
+  if (!entry) {
+    return (
+      <main className="min-h-screen bg-[var(--background)] p-8">
+        <Link
+          href="/journal"
+          className="text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--primary-dark)]"
+        >
+          ← Back to journal
+        </Link>
+
+        <div className="mt-8 rounded-3xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+          <p className="text-2xl">✎</p>
+
+          <h1 className="mt-3 text-xl font-extrabold">
+            Entry not found
+          </h1>
+
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            This journal entry does not exist.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const handleSave = () => {
-    if (title.trim() === "" || content.trim() === "" || date === "") {
+    if (
+      title.trim() === "" ||
+      content.trim() === "" ||
+      date === ""
+    ) {
       return;
     }
-
-    const entries = getJournalEntries();
 
     const formattedDate = new Date(
       `${date}T00:00:00`
@@ -33,39 +86,45 @@ export default function NewJournalEntryPage() {
       year: "numeric",
     });
 
-    const newEntry = {
-      id: Date.now(),
-      title: title.trim(),
-      content: content.trim(),
-      date: formattedDate,
-    };
+    const updatedEntries = entries.map((journalEntry) => {
+      if (journalEntry.id === entry.id) {
+        return {
+          ...journalEntry,
+          title: title.trim(),
+          content: content.trim(),
+          date: formattedDate,
+        };
+      }
 
-    saveJournalEntries([newEntry, ...entries]);
+      return journalEntry;
+    });
 
-    router.push("/journal");
+    saveJournalEntries(updatedEntries);
+
+    router.push(`/journal/${entry.id}`);
   };
 
   return (
     <main className="min-h-screen bg-[var(--background)] p-8">
       <div className="mx-auto max-w-4xl">
         <Link
-          href="/journal"
+          href={`/journal/${entry.id}`}
           className="text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--primary-dark)]"
         >
-          ← Back to journal
+          ← Back to entry
         </Link>
 
         <div className="mt-6">
           <p className="text-sm font-semibold text-[var(--lavender)]">
-            ✎ A little space for your thoughts
+            ✎ Make a little change
           </p>
 
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight">
-            New entry ♡
+            Edit entry ♡
           </h1>
 
           <p className="mt-2 text-[var(--muted)]">
-            Write down whatever is on your mind.
+            Update your thoughts whenever you like.
           </p>
         </div>
 
@@ -84,20 +143,16 @@ export default function NewJournalEntryPage() {
             type="text"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Give your entry a little title..."
             className="mt-2 w-full rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3 font-semibold outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--lavender)]"
           />
 
           <label className="mt-5 block text-sm font-bold">
             Date
-        </label>
+          </label>
 
-        <div className="mt-2">
-            <DatePicker
-                value={date}
-                onChange={setDate}
-            />
-        </div>
+          <div className="mt-2">
+            <DatePicker value={date} onChange={setDate} />
+          </div>
 
           <label className="mt-5 block text-sm font-bold">
             Entry
@@ -106,13 +161,12 @@ export default function NewJournalEntryPage() {
           <textarea
             value={content}
             onChange={(event) => setContent(event.target.value)}
-            placeholder="Write your thoughts here..."
             className="mt-2 min-h-80 w-full resize-y rounded-2xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-4 leading-relaxed outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--lavender)]"
           />
 
           <div className="mt-5 flex justify-end gap-3">
             <Link
-              href="/journal"
+              href={`/journal/${entry.id}`}
               className="rounded-2xl border border-[var(--border)] px-5 py-3 font-semibold transition hover:bg-[var(--primary-soft)]"
             >
               Cancel
@@ -122,7 +176,7 @@ export default function NewJournalEntryPage() {
               onClick={handleSave}
               className="rounded-2xl bg-[var(--primary)] px-6 py-3 font-bold transition hover:opacity-90"
             >
-              Save entry ♡
+              Save changes ♡
             </button>
           </div>
         </section>

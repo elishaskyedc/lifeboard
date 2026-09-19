@@ -1,4 +1,4 @@
- export type JournalEntry = {
+export type JournalEntry = {
   id: number;
   title: string;
   content: string;
@@ -22,16 +22,18 @@ export const defaultJournalEntries: JournalEntry[] = [
   },
 ];
 
+const STORAGE_KEY = "journalEntries";
+
 export function getJournalEntries(): JournalEntry[] {
   if (typeof window === "undefined") {
     return defaultJournalEntries;
   }
 
-  const savedEntries = localStorage.getItem("journalEntries");
+  const savedEntries = localStorage.getItem(STORAGE_KEY);
 
   if (!savedEntries) {
     localStorage.setItem(
-      "journalEntries",
+      STORAGE_KEY,
       JSON.stringify(defaultJournalEntries)
     );
 
@@ -42,8 +44,23 @@ export function getJournalEntries(): JournalEntry[] {
 }
 
 export function saveJournalEntries(entries: JournalEntry[]) {
-  localStorage.setItem(
-    "journalEntries",
-    JSON.stringify(entries)
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+
+  window.dispatchEvent(new Event("journalEntriesUpdated"));
+}
+
+export function subscribeToJournalEntries(callback: () => void) {
+  window.addEventListener("journalEntriesUpdated", callback);
+
+  return () => {
+    window.removeEventListener("journalEntriesUpdated", callback);
+  };
+}
+
+export function getJournalEntriesSnapshot() {
+  return JSON.stringify(getJournalEntries());
+}
+
+export function getJournalEntriesServerSnapshot() {
+  return JSON.stringify(defaultJournalEntries);
 }

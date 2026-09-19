@@ -61,6 +61,22 @@ export default function JournalEntryPage() {
         <p className="mt-8 whitespace-pre-wrap leading-8 text-[var(--foreground)]">
           {entry.content}
         </p>
+
+        <div className="mt-8 flex gap-3">
+            <Link
+                href={`/journal/${entry.id}/edit`}
+                className="rounded-2xl bg-[var(--primary)] px-5 py-3 font-bold transition hover:opacity-90"
+            >
+                Edit entry ♡
+            </Link>
+
+            <Link
+                href="/journal"
+                className="rounded-2xl border border-[var(--border)] px-5 py-3 font-semibold transition hover:bg-[var(--primary-soft)]"
+            >
+                Back to journal
+            </Link>
+        </div>
       </article>
     </main>
   );

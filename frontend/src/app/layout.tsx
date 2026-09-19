@@ -19,24 +19,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const savedTheme = localStorage.getItem("theme");
-
-                if (savedTheme === "dark") {
-                  document.documentElement.classList.add("dark");
-                }
-              } catch (error) {
-                console.error("Unable to load saved theme:", error);
-              }
-            `,
-          }}
-        />
-      </head>
-
       <body className={`${nunito.variable} min-h-full antialiased`}>
         {children}
       </body>
