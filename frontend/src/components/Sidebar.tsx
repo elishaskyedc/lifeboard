@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Sidebar() {
   const pathname = usePathname();
+
+  const [width, setWidth] = useState(256);
+  const [isResizing, setIsResizing] = useState(false);
 
   const links = [
     { href: "/", label: "♡ Dashboard" },
@@ -14,8 +18,46 @@ export default function Sidebar() {
     { href: "/calendar", label: "♡ Calendar" },
   ];
 
+  const startResizing = (event: React.MouseEvent) => {
+    event.preventDefault();
+
+    setIsResizing(true);
+
+    const startX = event.clientX;
+    const startWidth = width;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const newWidth = startWidth + (event.clientX - startX);
+
+      const minimumWidth = 160;
+      const maximumWidth = 256;
+
+      const limitedWidth = Math.min(
+        maximumWidth,
+        Math.max(minimumWidth, newWidth)
+      );
+
+      setWidth(limitedWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
   return (
-    <aside className="w-64 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] p-6">
+    <aside
+      style={{ width }}
+      className={`relative shrink-0 border-r border-[var(--border)] bg-[var(--surface)] p-6 ${
+        isResizing ? "" : "transition-[width] duration-150"
+      }`}
+    >
       <nav>
         <ul className="space-y-2">
           {links.map((link) => {
@@ -41,6 +83,13 @@ export default function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Resize handle */}
+      <div
+        onMouseDown={startResizing}
+        className="absolute right-0 top-0 h-full w-1 cursor-col-resize"
+        aria-label="Resize sidebar"
+      />
     </aside>
   );
 }
