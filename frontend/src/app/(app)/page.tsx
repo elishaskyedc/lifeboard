@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Greeting from "@/components/Greeting";
 
 export default function Home() {
@@ -14,7 +15,10 @@ export default function Home() {
 
       {/* summary cards */}
       <div className="mt-8 grid gap-6 md:grid-cols-2">
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
+        <Link
+          href="/tasks"
+          className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm transition hover:-translate-y-1 hover:bg-[var(--surface-soft)]"
+        >
           <p className="text-sm font-semibold text-[var(--primary-dark)]">
             ✦ Tasks
           </p>
@@ -28,9 +32,12 @@ export default function Home() {
           <p className="mt-1 text-sm text-[var(--muted)]">
             due today
           </p>
-        </div>
+        </Link>
 
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
+        <Link
+          href="/habits"
+          className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm transition hover:-translate-y-1 hover:bg-[var(--surface-soft)]"
+        >
           <p className="text-sm font-semibold text-[var(--mint)]">
             ♡ Habits
           </p>
@@ -44,10 +51,11 @@ export default function Home() {
           <p className="mt-1 text-sm text-[var(--muted)]">
             completed today
           </p>
-        </div>
+        </Link>
       </div>
 
       {/* today's schedule */}
+      {/* placeholder data for now (will eventually display user's actual scheduled events) */}
       <section className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -60,9 +68,12 @@ export default function Home() {
             </h2>
           </div>
 
-          <span className="rounded-full bg-[var(--primary-soft)] px-3 py-1 text-sm font-semibold">
+          <Link
+            href="/calendar"
+            className="rounded-full bg-[var(--primary-soft)] px-3 py-1 text-sm font-semibold transition hover:opacity-80"
+          >
             3 events
-          </span>
+          </Link>
         </div>
 
         <div className="mt-6 space-y-3">
@@ -104,9 +115,12 @@ export default function Home() {
             Take a moment to write something down.
           </p>
 
-          <button className="mt-5 rounded-full bg-[var(--primary)] px-5 py-2 font-bold">
+          <Link
+            href="/journal/new"
+            className="mt-5 inline-block rounded-full bg-[var(--primary)] px-5 py-2 font-bold transition hover:opacity-90"
+          >
             Write an entry ♡
-          </button>
+          </Link>
         </section>
 
         <section className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm">
@@ -119,13 +133,19 @@ export default function Home() {
           </h2>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <button className="rounded-full border border-[var(--border)] px-4 py-2 font-semibold">
+            <Link
+              href="/tasks"
+              className="rounded-full border border-[var(--border)] px-4 py-2 font-semibold transition hover:bg-[var(--primary-soft)]"
+            >
               + Add task
-            </button>
+            </Link>
 
-            <button className="rounded-full border border-[var(--border)] px-4 py-2 font-semibold">
+            <Link
+              href="/habits"
+              className="rounded-full border border-[var(--border)] px-4 py-2 font-semibold transition hover:bg-[var(--primary-soft)]"
+            >
               + Add habit
-            </button>
+            </Link>
           </div>
         </section>
       </div>
